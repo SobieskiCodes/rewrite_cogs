@@ -1,0 +1,16 @@
+#removes mee6 reddit posts that contain [removed] from automod.
+class rem6post:
+    def __init__(self, bot):
+        self.bot = bot
+
+    async def on_message(self, message):
+        cog_name = "rem6post"
+        if cog_name in self.bot.config.data.get('servers').get(str(message.guild.id)):
+            if message.author.name == "MEE6":
+                for x in message.embeds:
+                    if x.description == "\\[removed\\]" or x.description == "[removed]":
+                        await message.delete()
+
+
+def setup(bot):
+    bot.add_cog(rem6post(bot))
