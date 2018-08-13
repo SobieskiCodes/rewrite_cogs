@@ -214,7 +214,7 @@ class pomodoro:
             return
 
         if str(ctx.message.raw_mentions[0]) in self.bot.pomo.data.get('timers'):
-            if str(ctx.message.author.id) not in self.bot.pomo.data.get('timers').get(str(ctx.message.raw_mentions[0])):
+            if str(ctx.message.author.id) in self.bot.pomo.data.get('timers').get(str(ctx.message.raw_mentions[0])):
                 self.bot.pomo.data['timers'][str(ctx.message.raw_mentions[0])].pop(str(ctx.author.id), None)
                 self.bot.pomo.save()
                 await ctx.send('pomodoro left!')
