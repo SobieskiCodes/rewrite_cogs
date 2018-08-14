@@ -127,19 +127,14 @@ class pomodoro:
 
     @pomo_channel()
     @commands.command()
-    async def adjustwork(self, ctx, adjust: str = None, time: str = None):
-        ''': adjustwork <length/break> <time in minutes>'''
-        if not adjust or not time:
-            await ctx.send('it seems you didnt specify what to adjust! or time is invalid')
+    async def modifywork(self, ctx, time_length: str = None, break_time: str = None):
+        ''': modifywork <session_length/break_length>'''
+        if not time_length or not break_time:
+            await ctx.send('please provide both session length and break length times.')
             return
 
-        if not time.isdigit():
-            await ctx.send('time isnt a valid digit!')
-            return
-
-        contains = ['break', 'length']
-        if adjust.lower() not in contains:
-            await ctx.send('it seems you didnt specify what to adjust! valid format is length/break')
+        if not time_length.isdigit() or not break_time.isdigit():
+            await ctx.send('Those arent even real numbers!')
             return
 
         if str(ctx.author.id) not in self.bot.pomo.data.get('timers'):
@@ -147,10 +142,12 @@ class pomodoro:
             return
 
         else:
-            set_time = int(time) * 60
-            self.bot.pomo.data['timers'][str(ctx.message.author.id)][adjust] = set_time
+            set_time = int(time_length) * 60
+            set_break = int(break_time) * 60
+            self.bot.pomo.data['timers'][str(ctx.message.author.id)]['length'] = set_time
+            self.bot.pomo.data['timers'][str(ctx.message.author.id)]['break'] = set_break
             self.bot.pomo.save()
-            await ctx.send(f'{adjust} has been updated to {time}.')
+            await ctx.send(f'Session length is now:{time_length} break length is now:{break_time}.')
 
     @pomo_channel()
     @commands.command()
@@ -214,7 +211,7 @@ class pomodoro:
             return
 
         if str(ctx.message.raw_mentions[0]) in self.bot.pomo.data.get('timers'):
-            if str(ctx.message.author.id) in self.bot.pomo.data.get('timers').get(str(ctx.message.raw_mentions[0])):
+            if str(ctx.message.author.id) not in self.bot.pomo.data.get('timers').get(str(ctx.message.raw_mentions[0])):
                 self.bot.pomo.data['timers'][str(ctx.message.raw_mentions[0])].pop(str(ctx.author.id), None)
                 self.bot.pomo.save()
                 await ctx.send('pomodoro left!')
@@ -229,8 +226,8 @@ class pomodoro:
 
     @pomo_channel()
     @commands.command()
-    async def worksessions(self, ctx):
-        ''': worksessions lists all ongoing work sessions'''
+    async def checkwork(self, ctx):
+        ''': checkwork lists all ongoing work sessions'''
         embed = discord.Embed()
         session_list = ''
         for timer in self.bot.pomo.data.get('timers'):
