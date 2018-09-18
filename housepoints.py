@@ -1,5 +1,6 @@
 #harrypotter points
 #p!{house_initial(g/r/h/s} {remove/add} {points}
+#!housepoints/hp shows scoreboard
 
 from discord.ext import commands
 from cogs.util import pyson
