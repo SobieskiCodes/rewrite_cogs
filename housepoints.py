@@ -1,5 +1,5 @@
 #harrypotter points
-#p!{house} {remove/add} {points}
+#p!{house_initial(g/r/h/s} {remove/add} {points}
 
 from discord.ext import commands
 from cogs.util import pyson
