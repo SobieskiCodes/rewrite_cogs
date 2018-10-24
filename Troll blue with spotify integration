@@ -1,0 +1,16 @@
+#quick snippet i use to troll @blue 
+import discord
+
+class blue:
+    def __init__(self, bot):
+        self.bot = bot
+
+    async def on_member_update(self, before, after):
+        channel = discord.utils.get(after.guild.channels, name='general')
+        member = discord.utils.get(after.guild.members, id=101733376217591808)
+        if after.activity is not None and after.activity.name == 'Spotify' and after.id == 101733376217591808:
+            if after.activity.title.startswith('Dancin (feat. Luvli)') and before.activity.title != after.activity.title:
+                await channel.send(f'{member.mention} is listening to {after.activity.title} again.....')
+
+def setup(bot):
+    bot.add_cog(blue(bot))
