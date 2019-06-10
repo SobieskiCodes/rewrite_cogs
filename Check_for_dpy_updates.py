@@ -8,7 +8,7 @@ import discord
 import difflib
 import os
 import asyncio
-channel_id = 466672582222151680
+channel_id = 587667120976822283
 whats_new_url = 'https://raw.githubusercontent.com/Rapptz/discord.py/master/docs/whats_new.rst'
 haste_base = 'https://haste.discordbots.mundane.tk/'
 
@@ -45,15 +45,9 @@ class DpyUpdates(commands.Cog):
             else:
                 await DpyUpdates.download(self, "downloaded_whats_new.txt")
                 with open("current_whats_new.txt") as f, open('downloaded_whats_new.txt') as g:
-                    flines = f.readlines()
-                    glines = g.readlines()
-                    d = difflib.Differ()
-                    diff = d.compare(flines, glines)
-
-                only_additions = []
-                for line in diff:
-                    if line.startswith('+ ') and not line[2:].isspace():
-                        only_additions.append(line[2:])
+                    flines, glines = f.readlines(), g.readlines()
+                d = difflib.Differ()
+                only_additions = [l for l in d.compare(flines, glines) if l.startswith('+ ') and not l[2:].isspace()]
                 channel = await self.bot.fetch_channel(channel_id)
                 if only_additions:
                     additions = '\n'.join(only_additions)
