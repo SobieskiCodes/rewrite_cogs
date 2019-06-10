@@ -1,8 +1,6 @@
 #checks for discord.py updates every hour and posts them to a channel.
 #replies with no changes if none (can remove obviously)
 #if too large for embed sends to hastebin
-#need to download the current whats_new.rst and name it test1.txt
-#it will do the rest.
 
 
 from discord.ext import commands
@@ -28,23 +26,27 @@ class DpyUpdates(commands.Cog):
             else:
                 return 'invalid'
 
-    async def download_changes(self, time: int = 3600):
-        print('here')
-        while True:
+    async def download(self, filename):
+        if not os.path.exists(f"./{filename}"):
             async with self.bot.aiohttp.get(url=whats_new_url) as resp:
-                filename = os.path.basename('test2.txt')
                 with open(filename, 'wb') as f_handle:
                     while True:
                         chunk = await resp.content.read(1024)
                         if not chunk:
                             break
                         f_handle.write(chunk)
-                file = await resp.release()
+                return await resp.release()
 
-                with open("test1.txt") as f, open('test2.txt') as g:
+    async def main(self, time: int = 3600):
+        print('here')
+        while True:
+            if not os.path.exists(f"./current_whats_new.txt"):
+                await DpyUpdates.download(self, "current_whats_new.txt")
+            else:
+                await DpyUpdates.download(self, "downloaded_whats_new.txt")
+                with open("current_whats_new.txt") as f, open('downloaded_whats_new.txt') as g:
                     flines = f.readlines()
                     glines = g.readlines()
-
                     d = difflib.Differ()
                     diff = d.compare(flines, glines)
 
@@ -58,35 +60,31 @@ class DpyUpdates(commands.Cog):
                     if len(test) <= 2000:
                         e = discord.Embed(title='New Version of Discord.py out.', colour=discord.Colour(0x278d89),
                                           description=f"```{test}```")
-                        await channel.send(embed=e)
-
                     elif len(test) >= 2001:
                         message = 'The changes would exceed discord message length limit, here is the '
                         content = await DpyUpdates.get_url(self, test)
                         if content != 'invalid':
-                            e = discord.Embed(colour=discord.Colour(0x278d89), description=f'{message} [hastebin]({content}).')
-                            await channel.send(embed=e)
+                            description = f'{message} [hastebin]({content}).'
+                            e = discord.Embed(colour=discord.Colour(0x278d89), description=description)
                         else:
                             message = 'The reply would exceed discord message length limit, and hastebins.'
                             e = discord.Embed(colour=discord.Colour(0x278d89), description=f'{message}')
-                            await channel.send(embed=e)
-                    with open("test1.txt", 'w') as f, open('test2.txt') as g:
+                    with open("current_whats_new.txt", 'w') as f, open('downloaded_whats_new.txt') as g:
                         for line in g.readlines():
                             f.write(line)
+
+                    await channel.send(embed=e)
 
                 else:
                     await channel.send('No changes')
 
-                os.remove('test2.txt')
+                os.remove('downloaded_whats_new.txt')
 
             await asyncio.sleep(time)
 
-
     @commands.Cog.listener()
     async def on_ready(self):
-        self.bot.loop.create_task(DpyUpdates.download_changes(self))
-
-
+        self.bot.loop.create_task(DpyUpdates.main(self))
 
 
 def setup(bot):
