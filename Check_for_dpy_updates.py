@@ -10,6 +10,7 @@ import os
 import asyncio
 channel_id = 466672582222151680
 whats_new_url = 'https://raw.githubusercontent.com/Rapptz/discord.py/master/docs/whats_new.rst'
+haste_base = 'https://haste.discordbots.mundane.tk/'
 
 
 class DpyUpdates(commands.Cog):
@@ -17,11 +18,10 @@ class DpyUpdates(commands.Cog):
         self.bot = bot
 
     async def get_url(self, content):
-        async with self.bot.aiohttp.post('https://haste.discordbots.mundane.tk/documents',
-                                        data=content.encode('utf-8')) as resp:
+        async with self.bot.aiohttp.post(f'{haste_base}documents', data=content.encode('utf-8')) as resp:
             if resp.status == 200:
                 key = await resp.json()
-                url = f'https://haste.discordbots.mundane.tk/{key["key"]}.txt'
+                url = f'{haste_base}{key["key"]}.txt'
                 return url
             else:
                 return 'invalid'
