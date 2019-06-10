@@ -24,7 +24,7 @@ class DpyUpdates(commands.Cog):
                 url = f'{haste_base}{key["key"]}.txt'
                 return url
             else:
-                return 'invalid'
+                return
 
     async def download(self, filename):
         if not os.path.exists(f"./{filename}"):
@@ -38,7 +38,6 @@ class DpyUpdates(commands.Cog):
                 return await resp.release()
 
     async def main(self, time: int = 3600):
-        print('here')
         while True:
             if not os.path.exists(f"./current_whats_new.txt"):
                 await DpyUpdates.download(self, "current_whats_new.txt")
@@ -47,7 +46,7 @@ class DpyUpdates(commands.Cog):
                 with open("current_whats_new.txt") as f, open('downloaded_whats_new.txt') as g:
                     flines, glines = f.readlines(), g.readlines()
                 d = difflib.Differ()
-                only_additions = [l for l in d.compare(flines, glines) if l.startswith('+ ') and not l[2:].isspace()]
+                only_additions = [l[2:] for l in d.compare(flines, glines) if l.startswith('+ ') and not l[2:].isspace()]
                 channel = await self.bot.fetch_channel(channel_id)
                 if only_additions:
                     additions = '\n'.join(only_additions)
@@ -57,7 +56,7 @@ class DpyUpdates(commands.Cog):
                     elif len(additions) >= 2001:
                         message = 'The changes would exceed discord message length limit, here is the '
                         content = await DpyUpdates.get_url(self, additions)
-                        if content != 'invalid':
+                        if content:
                             description = f'{message} [hastebin]({content}).'
                             e = discord.Embed(colour=discord.Colour(0x278d89), description=description)
                         else:
