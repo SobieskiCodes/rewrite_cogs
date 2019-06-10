@@ -56,13 +56,13 @@ class DpyUpdates(commands.Cog):
                         only_additions.append(line[2:])
                 channel = await self.bot.fetch_channel(channel_id)
                 if only_additions:
-                    test = '\n'.join(only_additions)
-                    if len(test) <= 2000:
+                    additions = '\n'.join(only_additions)
+                    if len(additions) <= 2000:
                         e = discord.Embed(title='New Version of Discord.py out.', colour=discord.Colour(0x278d89),
-                                          description=f"```{test}```")
-                    elif len(test) >= 2001:
+                                          description=f"```{additions}```")
+                    elif len(additions) >= 2001:
                         message = 'The changes would exceed discord message length limit, here is the '
-                        content = await DpyUpdates.get_url(self, test)
+                        content = await DpyUpdates.get_url(self, additions)
                         if content != 'invalid':
                             description = f'{message} [hastebin]({content}).'
                             e = discord.Embed(colour=discord.Colour(0x278d89), description=description)
