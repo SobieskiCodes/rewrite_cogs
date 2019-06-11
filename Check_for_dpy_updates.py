@@ -24,7 +24,7 @@ class DpyUpdates(commands.Cog):
                 url = f'{haste_base}{key["key"]}.txt'
                 return url
             else:
-                return
+                return False
 
     async def download(self, filename):
         if not os.path.exists(f"./{filename}"):
@@ -46,10 +46,10 @@ class DpyUpdates(commands.Cog):
                 with open("current_whats_new.txt") as f, open('downloaded_whats_new.txt') as g:
                     flines, glines = f.readlines(), g.readlines()
                 d = difflib.Differ()
-                only_additions = [l[2:] for l in d.compare(flines, glines) if l.startswith('+ ') and not l[2:].isspace()]
+                only_addition = [l[2:] for l in d.compare(flines, glines) if l.startswith('+ ') and not l[2:].isspace()]
                 channel = await self.bot.fetch_channel(channel_id)
-                if only_additions:
-                    additions = '\n'.join(only_additions)
+                if only_addition:
+                    additions = '\n'.join(only_addition)
                     if len(additions) <= 2000:
                         e = discord.Embed(title='New Version of Discord.py out.', colour=discord.Colour(0x278d89),
                                           description=f"```{additions}```")
@@ -63,9 +63,7 @@ class DpyUpdates(commands.Cog):
                             message = 'The reply would exceed discord message length limit, and hastebins.'
                             e = discord.Embed(colour=discord.Colour(0x278d89), description=f'{message}')
                     with open("current_whats_new.txt", 'w') as f, open('downloaded_whats_new.txt') as g:
-                        for line in g.readlines():
-                            f.write(line)
-
+                        f.write("".join(g.readlines()))
                     await channel.send(embed=e)
 
                 else:
